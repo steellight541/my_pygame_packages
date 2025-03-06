@@ -66,9 +66,7 @@ class BaseWindow:
         new_y = mouse_pos[1] - self.__drag_bar.offset[1]
         self.__window_frame_rect.topleft = (new_x, new_y)
         self.__content_area_rect.topleft = (new_x + 1, new_y + 30)
-        self.__buttons["close"].rect.topleft = (new_x + self.__window_frame_rect.width - 30, new_y)
-        self.__buttons["minimize"].rect.topleft = (new_x + self.__window_frame_rect.width - 60, new_y)
-        self.__buttons["maximize"].rect.topleft = (new_x + self.__window_frame_rect.width - 90, new_y)
+        for i,  button in enumerate(self.__buttons): button.rect.topleft = (new_x + self.__window_frame_rect.width - (i + 1) *30, new_y)
         self.__drag_bar.rect.topleft = (new_x, new_y)
 
 

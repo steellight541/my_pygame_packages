@@ -31,6 +31,7 @@ class Button:
             (self.rect.x + 10, self.rect.y + 10)
         )
 
+
     @property
     def pressed(self): return ((self.rect.x <  get_mouse_pos()[0] < self.rect.x + self.rect.y and self.rect.y <  get_mouse_pos()[1] < self.rect.y  + self.rect.h) and get_mouse_pressed()[0])
 
@@ -60,6 +61,10 @@ class ButtonHandler:
     def event_handler(self, event): [button.event_handler(event) for button in self.__buttons]
 
     def get_pressed(self, name): return self[name].pressed
+
+    def update_positions(self, x, y): 
+        for button in self.__buttons.values():
+            button.rect.topleft = (button.rect.x + x, button.rect.y + y)
     
     def __getitem__(self, key): return self.__buttons[key]
     
