@@ -1,5 +1,8 @@
 from pygame.draw import rect
-from pygame.mouse import get_pos, get_pressed
+from pygame.mouse import (
+    get_pos as mouse_pos, 
+    get_pressed as get_mouse_pressed
+)
 from pygame.rect import Rect
 
 class DragBar():
@@ -15,16 +18,12 @@ class DragBar():
 
     @property
     def pressed(self):
-        if not get_pressed()[0]:
-            self.__dragging = False
-            return False
-        mouse_pos = get_pos()
-        if (self.drag_bar_rect.x < mouse_pos[0] < self.drag_bar_rect.x + self.drag_bar_rect.w and
-            self.drag_bar_rect.y < mouse_pos[1] < self.drag_bar_rect.y + self.drag_bar_rect.h):
-            if not self.__dragging:
-                self.__dragging = True
-                self.__offset = (mouse_pos[0] - self.drag_bar_rect.x, mouse_pos[1] - self.drag_bar_rect.y)
-            return True
+        if get_mouse_pressed()[0]:
+            if self.drag_bar_rect.collidepoint(mouse_pos()):
+                self.__offset = (mouse_pos()[0] - self.drag_bar_rect.x, mouse_pos()[1] - self.drag_bar_rect.y) if not self.__dragging else self.__offset
+                self.__dragging =  self.__dragging or True
+                return True
+        else: self.__dragging = False
         return False
 
     @property

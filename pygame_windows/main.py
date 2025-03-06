@@ -4,6 +4,7 @@ from .button import Button
 from .bar import DragBar
 
 from pygame.rect import Rect
+import pygame
 
 
 class WindowContent:
@@ -103,11 +104,9 @@ class BaseWindow:
     def event_handler(self, event):
         if self.__buttons["close"].pressed:
             self.active = False
-            return
-        if self.__buttons["minimize"].pressed:
+        elif self.__buttons["minimize"].pressed:
             self.active = False
-            return
-        if self.__drag_bar.pressed:
+        elif self.__drag_bar.pressed:
             mouse_pos = get_pos()
             new_x = mouse_pos[0] - self.__drag_bar.offset[0]
             new_y = mouse_pos[1] - self.__drag_bar.offset[1]

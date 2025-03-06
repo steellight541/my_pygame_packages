@@ -1,5 +1,8 @@
 from pygame.font import Font
-from pygame.mouse import get_pos, get_pressed
+from pygame.mouse import (
+    get_pos as get_mouse_pos, 
+    get_pressed as get_mouse_pressed
+)
 from pygame.draw import rect
 from pygame.rect import Rect
 
@@ -24,4 +27,4 @@ class Button():
         )
 
     @property
-    def pressed(self): return ((self.button_rect.x <  get_pos()[0] < self.button_rect.x + self.button_rect.y and self.button_rect.y <  get_pos()[1] < self.button_rect.y  + self.button_rect.h) and get_pressed()[0])
+    def pressed(self): return ((self.button_rect.x <  get_mouse_pos()[0] < self.button_rect.x + self.button_rect.y and self.button_rect.y <  get_mouse_pos()[1] < self.button_rect.y  + self.button_rect.h) and get_mouse_pressed()[0])
