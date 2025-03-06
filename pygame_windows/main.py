@@ -85,14 +85,6 @@ class BaseWindow:
 
         self.__content = Bouncingball()
 
-    @property
-    def screen(self):
-        return self.__screen
-    
-    @screen.setter
-    def screen(self, screen):
-        self.__screen = screen
-
     def draw(self):
         rect(self.screen, (255, 200, 255), self.__inner_window_rect) # window background
         self.__drag_bar.draw()
@@ -121,6 +113,6 @@ class BaseWindow:
             new_y = mouse_pos[1] - self.__drag_bar.offset[1]
             self.__window_border_rect = ((new_x, new_y), self.__window_border_rect[1])
             self.__inner_window_rect = ((new_x + 1, new_y + 31), (self.__window_border_rect[1][0] - 2, self.__window_border_rect[1][1] - 32))  # Adjusted for draggable bar height
-            self.__buttons["close"].button_rect = ((new_x + self.__window_border_rect[1][0] - 30, new_y), (30, 30))
-            self.__buttons["minimize"].button_rect = ((new_x + self.__window_border_rect[1][0] - 60, new_y), (30, 30))
-            self.__drag_bar.drag_bar_rect = ((new_x, new_y), (self.__window_border_rect[1][0], 30))
+            self.__buttons["close"].button_rect = Rect((new_x + self.__window_border_rect[1][0] - 30, new_y), (30, 30))
+            self.__buttons["minimize"].button_rect = Rect((new_x + self.__window_border_rect[1][0] - 60, new_y), (30, 30))
+            self.__drag_bar.drag_bar_rect = Rect((new_x, new_y), (self.__window_border_rect[1][0], 30))
