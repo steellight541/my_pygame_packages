@@ -8,7 +8,7 @@ from pygame.rect import (Rect as pygame_Rect)
 
 
 class Button:
-    def __init__(self, screen, x, y, width, height, text, color=(255, 255, 255), text_color=(0, 0, 0), text_centered=True):
+    def __init__(self, screen, x, y, width, height, text="this is a button", color=(255, 255, 255), text_color=(0, 0, 0), text_centered=True):
         self.screen = screen
         self.rect = pygame_Rect((x, y), (width, height))
         self.__text = {
