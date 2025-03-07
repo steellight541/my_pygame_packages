@@ -5,14 +5,13 @@ from pygame.rect import ( Rect as pygame_Rect )
 from pygame.display import get_surface
 
 
-
 # local imports
 from .button import Button, ButtonHandler
 from .bar import DragBar
-from .demos import Bouncingball
+from .content import WindowContent
 
 
-class BaseWindow:
+class BaseWindow():
     def __init__(self, screen, width=500, height=400, x=50, y=50):
         self.getting_dragged = False
         self.last_dragged = False
@@ -26,7 +25,7 @@ class BaseWindow:
             maximize=Button.maximize_button(screen, x + width - 90, y, 30, 30)
         )
         self.__drag_bar = DragBar(screen, x, y, width, 30)
-        self.__content = Bouncingball()
+        self.__content = WindowContent()
 
     def draw(self):
         pygame_rect(self.screen, (255, 200, 255), self.__content_area_rect) # window background
