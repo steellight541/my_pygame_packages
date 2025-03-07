@@ -25,7 +25,6 @@ class Bouncingball(WindowContent):
             ball['y'] += ball['dy']
             ball['dy'] += ball['gravity']
 
-            print(ball['x'], ball['y'], ball['dx'], ball['dy'])
             # Check for bounce with walls
             if ball['y'] + ball['radius'] >= self.bounding_box.height:
                 ball['y'] = self.bounding_box.height - ball['radius']
