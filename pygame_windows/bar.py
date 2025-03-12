@@ -1,9 +1,12 @@
 from pygame.draw import rect as pygame_rect
 from pygame.mouse import get_pos as mouse_pos, get_pressed as get_mouse_pressed
 from pygame.rect import Rect
+from pygame import Surface
+from pygame.event import Event
 
 class DragBar():
-    def __init__(self, screen, x, y, width, height, color =(0, 255, 255)):
+    
+    def __init__(self, screen: Surface, x:int, y:int, width:int, height:int, color: tuple[int, int, int] =(0, 255, 255)):
         self.screen = screen
         self.rect = Rect((x, y), (width, height))
         self.__color = color
@@ -28,5 +31,5 @@ class DragBar():
     def offset(self):
         return self.__offset
     
-    def event_handler(self, event):
+    def event_handler(self, event: Event):
         pass

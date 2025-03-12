@@ -1,4 +1,4 @@
-from pygame.font import Font, SysFont, get_fonts
+from pygame.font import SysFont
 from pygame.mouse import (
     get_pos as get_mouse_pos, 
     get_pressed as get_mouse_pressed

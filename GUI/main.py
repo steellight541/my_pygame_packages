@@ -5,12 +5,15 @@ class Colors:
     background: tuple[int, int, int, int]|str
     border: tuple[int, int, int]|str
     text: str
+
+
     def __init__(self, background: tuple[int, int, int, int]|str, border: tuple[int, int, int]|str, text: str) -> None:
         self.background = background
         self.border = border
         self.text = text
 
-    def keys(self):
+
+    def keys(self) -> list[str]:
         return ["background", "border", "text"]
 
     def __getitem__(self, key: str) -> Any:
