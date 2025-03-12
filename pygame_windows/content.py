@@ -11,8 +11,7 @@ class WindowContent:
         self._draw(screen)
         screen.set_clip(None)
 
-    def _draw(self, screen):
-        self.draw_rect(screen, (0, 0, 100, 100), (0, 0, 255))
+    def _draw(self, screen): ...
 
     def draw_rect(self, screen, rect_, color):
         rect(screen, color, Rect(rect_).move(self.bounding_box.topleft))
