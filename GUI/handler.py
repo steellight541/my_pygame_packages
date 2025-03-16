@@ -36,7 +36,7 @@ class GUIHandler:
         """Attach a listener to a button. If single=True, the listener is removed after being called once."""
         self._buttons.connect(button, listener, click_type)
 
-    def disconnect(self, button: Button, click_type: ClickType = ClickType.ONCE):
+    def button_disconnect(self, button: Button, click_type: ClickType = ClickType.ONCE):
         """Remove a listener from a button."""
         self._buttons.disconnect(button, click_type)
 
