@@ -1,13 +1,24 @@
-from color import Colors 
+from GUI.styles.color import Colors 
 from pygame import Surface, Rect
 from pygame.font import Font
 from pygame.mouse import get_pos
+from enum import Enum
+
 __all__ = ["Button"]
 __file__ = "GUI/button/button.py"
 
-class Button:
+
+class Button():
+    class ClickType(Enum):
+        SINGLE = 1 # Single click
+        DOUBLE = 2 # Double click
+        ONCE = 3 # Single event listener
+        ALL = 4 # Remove all listeners
+        HOVER = 5 # Not implemented yet
+
     def __init__(self, surface: Surface, rect: Rect, text: str, colors: Colors | None):
         """Initialize the button with a predefined surface and rect."""
+
         self.surface = surface
         self.rect = rect
         self.colors = colors or Colors()
@@ -19,23 +30,6 @@ class Button:
         """Update the button text."""
         self.text = text
         self.text_surf, self.text_rect = self.set_text(text)
-
-    @classmethod
-    def from_surface(cls, surface: Surface, pos: tuple[int, int] = (0, 0), text: str = "test", colors: Colors | None = None):
-        """Alternative constructor: Create a button from an existing surface."""
-        rect = surface.get_rect(topleft=pos)
-        return cls(surface, rect, text, colors)
-
-    @classmethod
-    def from_rect(cls, rect: Rect, text: str = "test", colors: Colors | None = None):
-        """Alternative constructor: Create a button from a rect."""
-        surface = Surface(rect.size)
-        return cls(surface, rect, text, colors)
-
-    @classmethod
-    def default(cls, text: str = "Default Button", colors: Colors | None = None):
-        """Alternative constructor: Create a default button (150x50)."""
-        return cls.from_rect(Rect(0, 0, 150, 50), text, colors)
 
     def set_text(self, text: str, padding: int = 5) -> tuple[Surface, Rect]:
         """Dynamically finds the best font size using binary search."""
@@ -80,3 +74,21 @@ class Button:
     def hovered(self) -> bool:
         """Returns True if the button is hovered."""
         return self.rect.collidepoint(*get_pos())
+    
+
+    @classmethod
+    def from_surface(cls, surface: Surface, pos: tuple[int, int] = (0, 0), text: str = "test", colors: Colors | None = None):
+        """Alternative constructor: Create a button from an existing surface."""
+        rect = surface.get_rect(topleft=pos)
+        return cls(surface, rect, text, colors)
+
+    @classmethod
+    def from_rect(cls, rect: Rect, text: str = "test", colors: Colors | None = None):
+        """Alternative constructor: Create a button from a rect."""
+        surface = Surface(rect.size)
+        return cls(surface, rect, text, colors)
+
+    @classmethod
+    def default(cls, text: str = "Default Button", colors: Colors | None = None):
+        """Alternative constructor: Create a default button (150x50)."""
+        return cls.from_rect(Rect(0, 0, 150, 50), text, colors)

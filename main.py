@@ -3,15 +3,15 @@ from GUI.handler import GUIHandler
 from GUI.button import *
 
 pygame.init()
-i = 0
 window = pygame.display.set_mode((800, 600))
-def on_double_click(button: Button):
-    print("Double clicked")
+
 handler = GUIHandler()
 btn = handler.add_button(Button.from_surface(pygame.Surface((100,100)), (100, 100)))
-handler.button_connect(btn, on_double_click, click_type=ClickType.DOUBLE)
 running = True
 
+@handler.connect(btn, ClickType.DOUBLE)
+def on_click(btn: Button):
+    print("Button clicked")
 
 while running:
     for event in pygame.event.get():

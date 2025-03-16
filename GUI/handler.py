@@ -1,5 +1,5 @@
 from GUI.button import *
-from typing import Callable
+from typing import Callable, Any
 from pygame import Surface
 from pygame.event import Event
 __all__ = [
@@ -43,3 +43,11 @@ class GUIHandler:
     def handle_events(self, event: Event):
         """Handle mouse click events and trigger listeners."""
         self._buttons.handle_events(event)
+
+    def connect(self, button: Any, click_type: ClickType) -> Callable[[Callable[[Button], None]], Callable[[Button], None]]:
+        """Decorator for connecting a listener to a button."""
+        def decorator(listener: Callable[[Any], None]):
+            if isinstance(button, Button):
+                self.button_connect(button, listener, click_type)
+            return listener
+        return decorator
