@@ -9,13 +9,12 @@ __file__ = "GUI/button/button.py"
 
 
 class Button():
-    class ClickType(Enum):
+    class BehaviorTypes(Enum):
         SINGLE = 1 # Single click
         DOUBLE = 2 # Double click
-        ONCE = 3 # Single event listener
-        ALL = 4 # Remove all listeners
-        HOVER = 5 # Not implemented yet
+        HOVER = 3 # Hover
 
+    
     def __init__(self, surface: Surface, rect: Rect, text: str, colors: Colors | None):
         """Initialize the button with a predefined surface and rect."""
 
@@ -29,41 +28,43 @@ class Button():
     def update_text(self, text: str) -> None:
         """Update the button text."""
         self.text = text
-        self.text_surf, self.text_rect = self.set_text(text)
+        self.text_surf, self.text_rect, self.font = self.set_text(text)
 
-    def set_text(self, text: str, padding: int = 5) -> tuple[Surface, Rect]:
+    def set_text(self, text: str, padding: int = 5) -> tuple[Surface, Rect, Font]:
         """Dynamically finds the best font size using binary search."""
         min_size, max_size = 1, self.rect.width 
         while min_size < max_size:
             size = (min_size + max_size) // 2
-            _, text_rect = self.process_text(text, size)
+            _, text_rect, _ = self.process_text(text, size)
             if text_rect.width + 5 > self.rect.width - padding: max_size = size
             else: min_size = size + 1
         return self.process_text(text, min_size)
 
-    def process_text(self, text: str, size: int) -> tuple[Surface, Rect]:
+    def process_text(self, text: str, size: int) -> tuple[Surface, Rect, Font]:
         """Creates a surface and rect for the text."""
         font = Font(None, size)
         text_surf = font.render(text, True, self.colors.text)
         text_rect = text_surf.get_rect(center=self.rect.center)
-        return text_surf, text_rect
-    
-    def update_visuals(self):
-        """Update the button visuals."""
-        if self.hovered: self.surface.fill(self.colors.hovered)
-        else: self.surface.fill(self.colors.button)
+        return text_surf, text_rect, font
 
     def draw(self, surface: Surface):
         """Draws the button onto the provided surface."""
-        self.update_visuals()
         surface.blit(self.surface, self.rect.topleft)
         surface.blit(self.text_surf, self.text_rect.topleft)
 
     def update_colors(self, colors: Colors):
         """Update the button colors."""
         self.colors = colors
-        self.surface.fill(self.colors.button)
-        self.text_surf, self.text_rect = self.set_text(self.text)
+        self.surface.fill(self.colors.button if not self.hovered else self.colors.hovered)
+        self.text_surf = self.font.render(self.text, True, self.colors.text)
+
+    def _on_hover(self):
+        """Called when the button is hovered."""
+        ... # Placeholder for custom hover behavior
+
+    def update(self):
+        """Handle mouse click events."""
+        self.update_colors(self.colors)
 
     @property
     def clicked(self) -> bool:

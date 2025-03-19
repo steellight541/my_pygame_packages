@@ -1,0 +1,7 @@
+scene:
+  name: "hello"
+  text: "Hello, World!"
+  buttons:
+    - button:
+        text: "Back"
+        action: "scene:main"
