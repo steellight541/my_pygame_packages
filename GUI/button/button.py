@@ -1,36 +1,38 @@
-from GUI.styles.color import Colors 
-from pygame import Surface, Rect
-from pygame.font import Font
-from pygame.mouse import get_pos
 from enum import Enum
+import pygame
+from GUI.styles import *
+from GUI.tooltip import Tooltip
 
-__all__ = ["Button"]
-__file__ = "GUI/button/button.py"
-
-
-class Button():
+class Button:
     class BehaviorTypes(Enum):
-        SINGLE = 1 # Single click
-        DOUBLE = 2 # Double click
-        HOVER = 3 # Hover
+        """The different types of button behaviors."""
+        SINGLE = 1
+        DOUBLE = 2
+        HOVER = 3
 
-    
-    def __init__(self, surface: Surface, rect: Rect, text: str, colors: Colors | None):
+    def __init__(
+            self,
+            surface: pygame.Surface, rect: pygame.Rect,
+            text: str,
+            style: Style, tooltip: Tooltip # type: ignore
+            ) -> None:
         """Initialize the button with a predefined surface and rect."""
-
         self.surface = surface
         self.rect = rect
-        self.colors = colors or Colors()
-        # Fill and set text
-        self.surface.fill(self.colors.button)
-        self.update_text(text)
+        self.text = text
+        self.style = style
+        self.tooltip = tooltip # this is a Tooltip object for hover info text
+        self.text_surf, self.text_rect, self.font = self.set_text(text)
+        self.surface.fill(self.style.colors.button)
+        self.add_border_around_surface(self.style.border)
+        
 
     def update_text(self, text: str) -> None:
         """Update the button text."""
         self.text = text
         self.text_surf, self.text_rect, self.font = self.set_text(text)
 
-    def set_text(self, text: str, padding: int = 5) -> tuple[Surface, Rect, Font]:
+    def set_text(self, text: str, padding: int = 5) -> tuple[pygame.Surface, pygame.Rect, pygame.font.Font]:
         """Dynamically finds the best font size using binary search."""
         min_size, max_size = 1, self.rect.width 
         while min_size < max_size:
@@ -40,56 +42,59 @@ class Button():
             else: min_size = size + 1
         return self.process_text(text, min_size)
 
-    def process_text(self, text: str, size: int) -> tuple[Surface, Rect, Font]:
+    def process_text(self, text: str, size: int) -> tuple[pygame.Surface, pygame.Rect, pygame.font.Font]:
         """Creates a surface and rect for the text."""
-        font = Font(None, size)
-        text_surf = font.render(text, True, self.colors.text)
+        font = pygame.font.Font(None, size)
+        text_surf = font.render(text, True, self.style.colors.text)
         text_rect = text_surf.get_rect(center=self.rect.center)
         return text_surf, text_rect, font
 
-    def draw(self, surface: Surface):
+    def draw(self, surface: pygame.Surface) -> None:
         """Draws the button onto the provided surface."""
+        self.add_border_around_surface(self.style.border)
         surface.blit(self.surface, self.rect.topleft)
         surface.blit(self.text_surf, self.text_rect.topleft)
+        if self.tooltip and self.hovered: self.tooltip.draw_at(pygame.mouse.get_pos())
 
-    def update_colors(self, colors: Colors):
-        """Update the button colors."""
-        self.colors = colors
-        self.surface.fill(self.colors.button if not self.hovered else self.colors.hovered)
-        self.text_surf = self.font.render(self.text, True, self.colors.text)
+    def update_style(self, style: Style) -> None:
+        """Update the button style."""
+        self.style = style
+        self.surface.fill(self.style.colors.button if not self.hovered else self.style.colors.hovered)
+        self.text_surf = self.font.render(self.text, True, self.style.colors.text)
 
-    def _on_hover(self):
-        """Called when the button is hovered."""
-        ... # Placeholder for custom hover behavior
+    def add_border_around_surface(self, border: Border) -> None:
+        """Add a border around the button."""
+        self.surface.fill(border.color, (0, 0, self.rect.width, border.top))
+        self.surface.fill(border.color, (0, 0, border.left, self.rect.height))
+        self.surface.fill(border.color, (0, self.rect.height - border.bottom, self.rect.width, border.bottom))
+        self.surface.fill(border.color, (self.rect.width - border.right, 0, border.right, self.rect.height))
 
-    def update(self):
-        """Handle mouse click events."""
-        self.update_colors(self.colors)
+    def update(self) -> None:
+        """Update the button."""
+        self.update_style(self.style)
 
     @property
     def clicked(self) -> bool:
-        """Returns True if the button is clicked."""
-        return self.rect.collidepoint(*get_pos())
-    
+        """Returns True if the button was clicked."""
+        return self.rect.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]
+
     @property
     def hovered(self) -> bool:
         """Returns True if the button is hovered."""
-        return self.rect.collidepoint(*get_pos())
+        return self.rect.collidepoint(pygame.mouse.get_pos())
     
 
     @classmethod
-    def from_surface(cls, surface: Surface, pos: tuple[int, int] = (0, 0), text: str = "test", colors: Colors | None = None):
-        """Alternative constructor: Create a button from an existing surface."""
-        rect = surface.get_rect(topleft=pos)
-        return cls(surface, rect, text, colors)
-
+    def from_surface(cls, surface: pygame.Surface, pos: tuple[int, int] = (0, 0), text: str = "test", style: Style = Style(), tooltip: Tooltip = Tooltip("center")) -> "Button":
+        """Create a button from a surface."""
+        return cls(surface, surface.get_rect(topleft=pos), text, style, tooltip)
+    
     @classmethod
-    def from_rect(cls, rect: Rect, text: str = "test", colors: Colors | None = None):
-        """Alternative constructor: Create a button from a rect."""
-        surface = Surface(rect.size)
-        return cls(surface, rect, text, colors)
-
+    def from_rect(cls, rect: pygame.Rect, text: str = "test", style: Style = Style(), tooltip: Tooltip = Tooltip("center")) -> "Button":
+        """Create a button from a rect."""
+        return cls(pygame.Surface(rect.size), rect, text, style, tooltip)
+    
     @classmethod
-    def default(cls, text: str = "Default Button", colors: Colors | None = None):
-        """Alternative constructor: Create a default button (150x50)."""
-        return cls.from_rect(Rect(0, 0, 150, 50), text, colors)
+    def default(cls, text: str = "Default Button", style: Style = Style(), tooltip: Tooltip = Tooltip("center")) -> "Button":
+        """Create a default button."""
+        return cls.from_rect(pygame.Rect(0, 0, 100, 50), text, style, tooltip)

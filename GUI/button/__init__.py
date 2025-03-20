@@ -1,2 +1,2 @@
-from .button import Button # type: ignore
-from .handler import ButtonHandler # type: ignore
+from .button import Button
+from .handler import ButtonHandler
