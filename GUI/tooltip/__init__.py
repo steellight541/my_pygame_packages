@@ -3,7 +3,7 @@ import pygame
 
 
 class Tooltip:
-    def __init__(self, pos_style: str, txt: str = "Hello, World!", style: Style = Style()) -> None:
+    def __init__(self, pos_style: str, txt:str="Hello World!", style: Style = Style()) -> None:
         pygame.font.init()
         self.pos_style = pos_style
         self.update_text(txt, style)
@@ -51,3 +51,8 @@ class Tooltip:
         self.surface.fill(border.color, (0, 0, border.left, self.rect.height))
         self.surface.fill(border.color, (0, self.rect.height - border.bottom, self.rect.width, border.bottom))
         self.surface.fill(border.color, (self.rect.width - border.right, 0, border.right, self.rect.height))
+
+    @classmethod
+    def default(cls, txt: str) -> "Tooltip":
+        """Create a default tooltip."""
+        return cls("topleft", txt)

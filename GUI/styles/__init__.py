@@ -1,3 +1,5 @@
+from typing import overload
+
 class Colors:
     button: tuple[int, int, int]|str
     hovered: tuple[int, int, int]|str
@@ -20,6 +22,7 @@ class Colors:
     def default(cls) -> "Colors":
         """Create a default color scheme."""
         return cls()
+
 class Border:
     """A class to represent the border of a button."""
     color: tuple[int, int, int]|str
@@ -27,32 +30,57 @@ class Border:
     right: int
     bottom: int
     left: int
-    def __init__(self, color: tuple[int, int, int] = (0, 0, 0), top: int = 2, right: int = 2, bottom: int = 2, left: int = 2) -> None:
-        """Initialize the border with default values."""
+    @overload
+    def __init__(self, color: tuple[int, int, int], top: int, right: int, bottom: int, left: int) -> None:
+        pass
+
+    @overload
+    def __init__(self, color: tuple[int, int, int], top_bottom: int, left_right: int) -> None:
+        pass
+
+    @overload
+    def __init__(self, color: tuple[int, int, int], width: int) -> None:
+        pass
+
+    def __init__(self, color: tuple[int, int, int]|str = (0, 0, 0), *args) -> None: # type: ignore
+        """Initialize the border with a color and width."""
         self.color = color
-        self.top = top
-        self.right = right
-        self.bottom = bottom
-        self.left = left
+        if len(args) == 1:
+            width = args[0]
+            self.top = width
+            self.right = width
+            self.bottom = width
+            self.left = width
+
+        elif len(args) == 2:
+            top_bottom, left_right = args
+            self.top = top_bottom
+            self.right = left_right
+            self.bottom = top_bottom
+            self.left = left_right
+
+        elif len(args) == 4:
+            self.top, self.right, self.bottom, self.left = args
+
+        else:
+            raise ValueError("Border must have 1, 2, or 4 arguments.")
 
     @classmethod
     def default(cls) -> "Border":
         """Create a default border."""
-        return cls()
+        return cls((0,0,0), 1)
 
     def __repr__(self) -> str:
         return f"Border({self.color}, {self.top}, {self.right}, {self.bottom}, {self.left})"
 
 class Padding:
     """Padding class for padding in GUI elements."""
-    all: int
     left: int
     right: int
     top: int
     bottom: int
     def __init__(self, *args: int) -> None:
         if len(args) == 1:
-            self.all = args[0]
             self.left = args[0]
             self.right = args[0]
             self.top = args[0]
@@ -70,8 +98,8 @@ class Padding:
             self.top = args[2]
             self.bottom = args[3]
 
-        else: raise ValueError("Padding must have 1, 2, or 4 arguments.")
-
+        else: 
+            raise ValueError("Padding must have 1, 2, or 4 arguments.")
 
     @classmethod
     def default(cls) -> "Padding":
@@ -80,11 +108,10 @@ class Padding:
     def __repr__(self) -> str:
         return f"Padding({self.left}, {self.right}, {self.top}, {self.bottom})"
 
-
 class Style:
     """A class to represent the style of a button."""
-    def __init__(self, colors: Colors = Colors(), border: Border = Border(), padding: int = 5) -> None:
-        """Initialize the style with default colors and border."""
+    def __init__(self, colors: Colors = Colors(), border: Border = Border.default(), padding: Padding = Padding.default()) -> None:
+        """Initialize the style with default colors, border, and padding."""
         self.colors = colors
         self.border = border
         self.padding = padding
@@ -92,7 +119,7 @@ class Style:
     @classmethod
     def default(cls) -> "Style":
         """Create a default style."""
-        return cls(Colors.default(), Border.default())
+        return cls(Colors.default(), Border.default(), Padding.default())
 
     def __repr__(self) -> str:
-        return f"Style({self.colors}, {self.border})"
+        return f"Style({self.colors}, {self.border}, {self.padding})"

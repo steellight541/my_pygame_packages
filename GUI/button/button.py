@@ -3,12 +3,15 @@ import pygame
 from GUI.styles import *
 from GUI.tooltip import Tooltip
 
+
 class Button:
     class BehaviorTypes(Enum):
         """The different types of button behaviors."""
         SINGLE = 1
         DOUBLE = 2
         HOVER = 3
+
+    _last_click_time: float
 
     def __init__(
             self,
@@ -31,22 +34,34 @@ class Button:
         """Update the button text."""
         self.text = text
         self.text_surf, self.text_rect, self.font = self.set_text(text)
-
-    def set_text(self, text: str, padding: int = 5) -> tuple[pygame.Surface, pygame.Rect, pygame.font.Font]:
+    
+    def set_text(self, text: str) -> tuple[pygame.Surface, pygame.Rect, pygame.font.Font]:
         """Dynamically finds the best font size using binary search."""
-        min_size, max_size = 1, self.rect.width 
+        padding = self.style.padding
+        available_width = self.rect.width - (padding.left + padding.right)
+        available_height = self.rect.height - (padding.top + padding.bottom)
+        
+        min_size, max_size = 1, available_width
         while min_size < max_size:
             size = (min_size + max_size) // 2
             _, text_rect, _ = self.process_text(text, size)
-            if text_rect.width + 5 > self.rect.width - padding: max_size = size
-            else: min_size = size + 1
+            if text_rect.width > available_width or text_rect.height > available_height:
+                max_size = size
+            else:
+                min_size = size + 1
         return self.process_text(text, min_size)
-
+    
     def process_text(self, text: str, size: int) -> tuple[pygame.Surface, pygame.Rect, pygame.font.Font]:
         """Creates a surface and rect for the text."""
         font = pygame.font.Font(None, size)
         text_surf = font.render(text, True, self.style.colors.text)
-        text_rect = text_surf.get_rect(center=self.rect.center)
+        padding = self.style.padding
+        text_rect = text_surf.get_rect(
+            center=(
+                self.rect.left + padding.left + (self.rect.width - padding.left - padding.right) // 2,
+                self.rect.top + padding.top + (self.rect.height - padding.top - padding.bottom) // 2
+            )
+        )
         return text_surf, text_rect, font
 
     def draw(self, surface: pygame.Surface) -> None:
@@ -85,16 +100,22 @@ class Button:
     
 
     @classmethod
-    def from_surface(cls, surface: pygame.Surface, pos: tuple[int, int] = (0, 0), text: str = "test", style: Style = Style(), tooltip: Tooltip = Tooltip("center")) -> "Button":
+    def from_surface(cls, surface: pygame.Surface, pos: tuple[int, int] = (0, 0), text: str = "test", style: Style = Style.default(), tooltip: Tooltip = Tooltip.default("center")) -> "Button":
         """Create a button from a surface."""
         return cls(surface, surface.get_rect(topleft=pos), text, style, tooltip)
     
     @classmethod
-    def from_rect(cls, rect: pygame.Rect, text: str = "test", style: Style = Style(), tooltip: Tooltip = Tooltip("center")) -> "Button":
+    def from_rect(cls, rect: pygame.Rect, text: str = "test", style: Style = Style.default(), tooltip: Tooltip = Tooltip.default("center")) -> "Button":
         """Create a button from a rect."""
         return cls(pygame.Surface(rect.size), rect, text, style, tooltip)
     
     @classmethod
-    def default(cls, text: str = "Default Button", style: Style = Style(), tooltip: Tooltip = Tooltip("center")) -> "Button":
+    def default(cls, text: str = "Default Button", style: Style = Style.default(), tooltip: Tooltip = Tooltip.default("center")) -> "Button":
         """Create a default button."""
         return cls.from_rect(pygame.Rect(0, 0, 100, 50), text, style, tooltip)
+    
+    def __repr__(self) -> str:
+        return f"Button({self.text})"
+    
+    def __str__(self) -> str:
+        return f"Button({self.text})"
